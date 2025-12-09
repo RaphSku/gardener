@@ -93,6 +93,11 @@ func (k *kubeStateMetrics) clusterRole() *rbacv1.ClusterRole {
 			Resources: []string{"gardens", "extensions"},
 			Verbs:     []string{"list", "watch"},
 		},
+		{
+			APIGroups: []string{"seedmanagement.gardener.cloud"},
+			Resources: []string{"gardenlets"},
+			Verbs:     []string{"list", "watch"},
+		},
 	}
 
 	if k.values.ClusterType == component.ClusterTypeSeed {
@@ -406,6 +411,7 @@ var gardenMetricAllowlist = []string{
 	"^garden_garden_condition$",
 	"^garden_garden_last_operation$",
 	"^garden_extension_condition$",
+	"^garden_gardenlet_condition$",
 }
 
 var cacheMetricAllowlist = []string{
@@ -720,7 +726,7 @@ func (k *kubeStateMetrics) nameSuffix() string {
 func (k *kubeStateMetrics) customResourceStateConfigMap() (*corev1.ConfigMap, error) {
 	opts := []Option{WithVPAMetrics}
 	if k.values.NameSuffix == SuffixRuntime {
-		opts = append(opts, WithGardenResourceMetrics, WithOperatorExtensionMetrics)
+		opts = append(opts, WithGardenResourceMetrics, WithOperatorExtensionMetrics, WithGardenletMetrics)
 	}
 
 	customResourceStateConfig, err := yaml.Marshal(NewCustomResourceStateConfig(opts...))

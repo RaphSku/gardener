@@ -220,6 +220,45 @@ func newOperatorExtensionCustomResourceStateMetrics() customresourcestate.Resour
 	return resource
 }
 
+func newGardenletCustomResourceStateMetrics() customresourcestate.Resource {
+	gardenletMetricNamePrefix := "garden"
+
+	resource := customresourcestate.Resource{
+		GroupVersionKind: customresourcestate.GroupVersionKind{
+			Group:   "seedmanagement.gardener.cloud",
+			Kind:    "Gardenlet",
+			Version: "v1alpha1",
+		},
+		MetricNamePrefix: &gardenletMetricNamePrefix,
+		Labels: customresourcestate.Labels{
+			LabelsFromPath: map[string][]string{
+				"name": {"metadata", "name"},
+			},
+		},
+	}
+
+	resource.Metrics = append(resource.Metrics, customresourcestate.Generator{
+		Name: "gardenlet_condition",
+		Help: "represents a condition of a Gardenlet object",
+		Each: customresourcestate.Metric{
+			Type: metric.StateSet,
+			StateSet: &customresourcestate.MetricStateSet{
+				LabelName: "status",
+				List:      []string{"Progressing", "True", "False", "Unknown"},
+				ValueFrom: []string{"status"},
+				MetricMeta: customresourcestate.MetricMeta{
+					LabelsFromPath: map[string][]string{
+						"condition": {"type"},
+					},
+					Path: []string{"status", "conditions"},
+				},
+			},
+		},
+	})
+
+	return resource
+}
+
 // Option is a functional option type used to configure the CustomResourceState settings
 type Option func(*customresourcestate.Metrics)
 
@@ -231,6 +270,11 @@ func WithGardenResourceMetrics(c *customresourcestate.Metrics) {
 // WithOperatorExtensionMetrics adds the custom resource state configuration for the Garden resource
 func WithOperatorExtensionMetrics(c *customresourcestate.Metrics) {
 	c.Spec.Resources = append(c.Spec.Resources, newOperatorExtensionCustomResourceStateMetrics())
+}
+
+// WithGardenletMetrics adds the custom resource state configuration for the Gardenlet resource
+func WithGardenletMetrics(c *customresourcestate.Metrics) {
+	c.Spec.Resources = append(c.Spec.Resources, newGardenletCustomResourceStateMetrics())
 }
 
 // WithVPAMetrics adds the custom resource state configuration for the VerticalPodAutoscaler resource

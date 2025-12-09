@@ -1,0 +1,39 @@
+spec:
+  resources:
+    - metricNamePrefix: garden
+      groupVersionKind:
+        group: seedmanagement.gardener.cloud
+        version: v1alpha1
+        kind: Gardenlet
+      commonLabels: {}
+      labelsFromPath:
+        name:
+          - metadata
+          - name
+      metrics:
+        - name: gardenlet_condition
+          help: represents a condition of a Gardenlet object
+          each:
+            type: stateset
+            gauge: null
+            stateSet:
+              labelsFromPath:
+                condition:
+                  - type
+              path:
+                - status
+                - conditions
+              list:
+                - Progressing
+                - "True"
+                - "False"
+                - Unknown
+              labelName: status
+              valueFrom:
+                - status
+            info: null
+          commonLabels: {}
+          labelsFromPath: {}
+          errorLogV: 0
+      errorLogV: 0
+      resourcePlural: ""

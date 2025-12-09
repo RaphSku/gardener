@@ -125,6 +125,11 @@ var _ = Describe("KubeStateMetrics", func() {
 						Resources: []string{"gardens", "extensions"},
 						Verbs:     []string{"list", "watch"},
 					},
+					{
+						APIGroups: []string{"seedmanagement.gardener.cloud"},
+						Resources: []string{"gardenlets"},
+						Verbs:     []string{"list", "watch"},
+					},
 				},
 			}
 
@@ -346,7 +351,8 @@ var _ = Describe("KubeStateMetrics", func() {
 							"^kube_customresource_verticalpodautoscaler_spec_updatepolicy_updatemode$," +
 							"^garden_garden_condition$," +
 							"^garden_garden_last_operation$," +
-							"^garden_extension_condition$",
+							"^garden_extension_condition$," +
+							"^garden_gardenlet_condition$",
 						"--custom-resource-state-config-file=/config/custom-resource-state.yaml",
 					}
 				}
